@@ -1,11 +1,12 @@
 using dotnet9.Dtos.Models;
-using dotnet9.Repositories;
 using dotnet9.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet9.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class ContactUsController : ControllerBase
     {
