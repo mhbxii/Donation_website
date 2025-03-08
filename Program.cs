@@ -103,13 +103,15 @@ builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IArticleMgmtService, ArticleMgmtService>();
+builder.Services.AddScoped<IRequestMgmtService, RequestMgmtService>();
 builder.Services.AddScoped<ISetUserImageService, SetUserImageService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IArticleImageRepository, ArticleImageRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 builder.Services.AddScoped<IContactUsRepository, ContactUsRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 
 // Rate Limiting
 builder.Services.AddRateLimiter(options =>

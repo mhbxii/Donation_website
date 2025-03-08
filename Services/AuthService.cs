@@ -125,6 +125,9 @@ namespace dotnet9.Services
             if (user == null)
                 throw new Exception("Invalid request.");
 
+            if(dto.NewPassword != dto.ConfirmPassword)
+                throw new Exception("Confirm password doesnt match.");
+
             var resetResult = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
             if (!resetResult.Succeeded)
                 throw new Exception(string.Join(", ", resetResult.Errors.Select(e => e.Description)));

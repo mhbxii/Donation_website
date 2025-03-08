@@ -9,7 +9,7 @@ namespace dotnet9.Services
     public class ImageUploadService : IImageUploadService
     {
         private readonly Cloudinary _cloudinary;
-        public ImageUploadService(IConfiguration configuration, IArticleImageRepository imageRepo)
+        public ImageUploadService(IConfiguration configuration, IImageRepository imageRepo)
         {
             // Initialize Cloudinary using configuration values.
             var account = new Account(

@@ -1,4 +1,5 @@
 using dotnet9.Dtos.Models;
+using dotnet9.Dtos.Wrappers;
 using dotnet9.Interfaces;
 using dotnet9.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -19,12 +20,12 @@ namespace dotnet9.Controllers
             _articleMgmtService = articleMgmtService;
         }
 
-        [HttpPost("withImages")]
-        public async Task<IActionResult> CreateArticleWithImages([FromForm] ArticleDto articleDto, [FromForm] List<IFormFile> imageFiles)
+        [HttpPost]
+        public async Task<IActionResult> CreateArticleWithImages([FromForm] CreateArticletDto dto)
         {
             try
             {
-                var article = await _articleMgmtService.CreateArticleWithImagesAsync(articleDto, imageFiles);
+                var article = await _articleMgmtService.CreateArticleWithImagesAsync(dto.ArticleDto, dto.ImageFiles!);
                 return Ok(article);
             }
             catch (Exception ex)
@@ -37,26 +38,16 @@ namespace dotnet9.Controllers
         public async Task<IActionResult> GetAll() =>
             Ok(await _articleRepo.GetAllAsync());
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllArticles() =>
-            Ok(await _articleRepo.GetAllArticlesAsync());
-
-        [HttpGet("Requests")]
-        public async Task<IActionResult> GetAllRequests() =>
-            Ok(await _articleRepo.GetAllRequestsAsync());
+        [HttpGet("GetByUserId")]
+        public async Task<IActionResult> GetByUserId(Guid userId){
+            return Ok(await _articleRepo.GetByUserIdAsync(userId));
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var article = await _articleRepo.GetByIdAsync(id);
             return article is null ? NotFound() : Ok(article);
-        }
-
-        [HttpPost("Request")]
-        public async Task<IActionResult> CreateRequest([FromBody] ArticleDto articleDto)
-        {
-            var created = await _articleRepo.AddAsync(articleDto);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -75,6 +66,16 @@ namespace dotnet9.Controllers
             var res = await _articleMgmtService.DeleteArticleAndImagesAsync(id);
             if(res)
                 return Ok("Deleted");
+            return BadRequest("Oops.");
+        }
+
+        [HttpPost("{articleId}/AcceptRequest/{requestId}")]
+        public async Task<IActionResult> AcceptRequest([FromRoute] Guid articleId, [FromRoute] Guid requestId){
+
+            var res = await _articleRepo.AcceptRequestAsync(articleId, requestId);
+
+            if(res)
+                return Ok("Success!");
             return BadRequest("Oops.");
         }
     }

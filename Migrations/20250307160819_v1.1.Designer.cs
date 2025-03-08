@@ -12,8 +12,8 @@ using dotnet9.Data;
 namespace dotnet9.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250304233945_FirstThingFirst")]
-    partial class FirstThingFirst
+    [Migration("20250307160819_v1.1")]
+    partial class v11
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -187,19 +187,21 @@ namespace dotnet9.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsDonation")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -211,27 +213,6 @@ namespace dotnet9.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Articles");
-                });
-
-            modelBuilder.Entity("dotnet9.Models.ArticleImage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArticleId");
-
-                    b.ToTable("ArticleImages");
                 });
 
             modelBuilder.Entity("dotnet9.Models.Category", b =>
@@ -274,6 +255,75 @@ namespace dotnet9.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ContactUs");
+                });
+
+            modelBuilder.Entity("dotnet9.Models.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid?>("ArticleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RequestId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RequestId");
+
+                    b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("dotnet9.Models.Request", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Requests");
                 });
 
             modelBuilder.Entity("dotnet9.Models.User", b =>
@@ -432,17 +482,6 @@ namespace dotnet9.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("dotnet9.Models.ArticleImage", b =>
-                {
-                    b.HasOne("dotnet9.Models.Article", "Article")
-                        .WithMany("Images")
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
-                });
-
             modelBuilder.Entity("dotnet9.Models.ContactUs", b =>
                 {
                     b.HasOne("dotnet9.Models.User", "User")
@@ -454,14 +493,51 @@ namespace dotnet9.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("dotnet9.Models.Image", b =>
+                {
+                    b.HasOne("dotnet9.Models.Article", null)
+                        .WithMany("ArticleImages")
+                        .HasForeignKey("ArticleId");
+
+                    b.HasOne("dotnet9.Models.Request", null)
+                        .WithMany("RequestImages")
+                        .HasForeignKey("RequestId");
+                });
+
+            modelBuilder.Entity("dotnet9.Models.Request", b =>
+                {
+                    b.HasOne("dotnet9.Models.Article", "Article")
+                        .WithMany("Requests")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("dotnet9.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Article");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("dotnet9.Models.Article", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("ArticleImages");
+
+                    b.Navigation("Requests");
                 });
 
             modelBuilder.Entity("dotnet9.Models.Category", b =>
                 {
                     b.Navigation("Articles");
+                });
+
+            modelBuilder.Entity("dotnet9.Models.Request", b =>
+                {
+                    b.Navigation("RequestImages");
                 });
 
             modelBuilder.Entity("dotnet9.Models.User", b =>

@@ -6,7 +6,7 @@ namespace dotnet9.Models{
         public required string Title { get; set; }
         public required string Location { get; set; }
         public string? Description { get; set; }
-        public bool IsDonation { get; set; }  // true = donation, false = request
+        public int Quantity { get; set; }  // true = donation, false = request
         public Guid UserId { get; set; }
         public User? User { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -18,7 +18,9 @@ namespace dotnet9.Models{
         public Category? Category { get; set; }
 
         // Navigation property for images.
-        public ICollection<ArticleImage>? ArticleImages { get; set; }
+        public ICollection<Image>? ArticleImages { get; set; } = [];
+        // Navigation property for requests.
+        public ICollection<Request>? Requests { get; set; } = [];
     }
 
 }

@@ -9,10 +9,10 @@ namespace dotnet9.Controllers
     [ApiController]
     [Authorize]
     [Route("[controller]")]
-    public class ArticleImagesController : ControllerBase
+    public class ImagesController : ControllerBase
     {
-        private readonly IArticleImageRepository _imageRepo;
-        public ArticleImagesController(IArticleImageRepository imageRepo){
+        private readonly IImageRepository _imageRepo;
+        public ImagesController(IImageRepository imageRepo){
             _imageRepo = imageRepo;
         }
 
@@ -28,7 +28,7 @@ namespace dotnet9.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ArticleImageDto dto)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ImageDto dto)
         {
             if (id != dto.Id)
                 return BadRequest("ID mismatch");

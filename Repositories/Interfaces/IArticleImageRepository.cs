@@ -2,12 +2,12 @@ using dotnet9.Dtos.Models;
 
 namespace dotnet9.Repositories.Interfaces
 {
-    public interface IArticleImageRepository
+    public interface IImageRepository
     {
-        Task<IEnumerable<ArticleImageDto>> GetAllAsync();
-        Task<ArticleImageDto?> GetByIdAsync(Guid id);
-        Task<ArticleImageDto> AddAsync(ArticleImageDto articleImageDto);
-        Task<ArticleImageDto?> UpdateAsync(ArticleImageDto articleImageDto);
+        Task<IEnumerable<ImageDto>> GetAllAsync();
+        Task<ImageDto?> GetByIdAsync(Guid id);
+        Task<ImageDto> AddAsync(ImageDto ImageDto);
+        Task<ImageDto?> UpdateAsync(ImageDto ImageDto);
         Task DeleteAsync(Guid id);
     }
 }

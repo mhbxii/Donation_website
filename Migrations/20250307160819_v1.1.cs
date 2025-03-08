@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace dotnet9.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstThingFirst : Migration
+    public partial class v11 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -205,10 +205,10 @@ namespace dotnet9.Migrations
                     Title = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    IsDonation = table.Column<bool>(type: "boolean", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -229,22 +229,57 @@ namespace dotnet9.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ArticleImages",
+                name: "Requests",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: false)
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleImages", x => x.Id);
+                    table.PrimaryKey("PK_Requests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ArticleImages_Articles_ArticleId",
+                        name: "FK_Requests_Articles_ArticleId",
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Requests_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    ImageUrl = table.Column<string>(type: "text", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: true),
+                    RequestId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Images_Articles_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Articles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Images_Requests_RequestId",
+                        column: x => x.RequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -255,11 +290,6 @@ namespace dotnet9.Migrations
                     { new Guid("00000000-0000-0000-0000-000000000001"), null, "Admin", "ADMIN" },
                     { new Guid("00000000-0000-0000-0000-000000000002"), null, "User", "USER" }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArticleImages_ArticleId",
-                table: "ArticleImages",
-                column: "ArticleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_CategoryId",
@@ -312,14 +342,36 @@ namespace dotnet9.Migrations
                 name: "IX_ContactUs_UserId",
                 table: "ContactUs",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Images_ArticleId",
+                table: "Images",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Images_ParentId",
+                table: "Images",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Images_RequestId",
+                table: "Images",
+                column: "RequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Requests_ArticleId",
+                table: "Requests",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Requests_UserId",
+                table: "Requests",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ArticleImages");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -339,10 +391,16 @@ namespace dotnet9.Migrations
                 name: "ContactUs");
 
             migrationBuilder.DropTable(
-                name: "Articles");
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Requests");
+
+            migrationBuilder.DropTable(
+                name: "Articles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
