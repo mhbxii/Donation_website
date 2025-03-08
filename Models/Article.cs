@@ -1,4 +1,6 @@
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace dotnet9.Models{
     public class Article
     {
@@ -18,6 +20,7 @@ namespace dotnet9.Models{
         public Category? Category { get; set; }
 
         // Navigation property for images.
+        [NotMapped]
         public ICollection<Image>? ArticleImages { get; set; } = [];
         // Navigation property for requests.
         public ICollection<Request>? Requests { get; set; } = [];

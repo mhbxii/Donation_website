@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace dotnet9.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {

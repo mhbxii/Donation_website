@@ -14,6 +14,6 @@ namespace dotnet9.Dtos.Models{
         public string UserName { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public ICollection<string>? Images { get; set; } = [];
-        public ICollection<RequestDto>? Requests { get; set; } = [];
+        public ICollection<RequestInfoDto>? Requests { get; set; } = [];
     }
 }

@@ -99,7 +99,8 @@ namespace dotnet9.Repositories
                 .Where(a => a.UserId == userId)
                 .Include(a => a.User)
                 .Include(a => a.Category)
-                .Include(a => a.Requests)
+                .Include(a => a.Requests!) // Include Requests first
+                    .ThenInclude(r => r.User) // ✅ Include User inside Requests
                 .Select(a => new ArticleInfoDto
                 {
                     Id = a.Id,
@@ -109,14 +110,14 @@ namespace dotnet9.Repositories
                     Quantity = a.Quantity,
                     CreatedAt = a.CreatedAt,
                     UpdatedAt = a.UpdatedAt,
-                    UserName = a.User!.UserName!,
+                    UserName = a.User!.UserName!, // Article owner
                     Category = a.Category!.Name,
-                    Requests = a.Requests!.Select(r => new RequestDto
+                    Requests = a.Requests!.Select(r => new RequestInfoDto
                     {
                         Id = r.Id,
                         Description = r.Description!,
                         Quantity = r.Quantity,
-                        UserId = r.UserId,
+                        Username = r.User != null ? r.User.UserName : "Unknown", // ✅ Get requester's username safely
                         CreatedAt = r.CreatedAt,
                         UpdatedAt = r.UpdatedAt,
                         ArticleId = r.ArticleId,
@@ -124,13 +125,11 @@ namespace dotnet9.Repositories
                             .Where(i => i.ParentId == r.Id)
                             .Select(i => i.ImageUrl)
                             .ToList()
-                        // If you need images, you can add that projection here too.
                     }).ToList(),
-                    // Manually fetch images for this article
                     Images = _context.Images
-                            .Where(i => i.ParentId == a.Id)
-                            .Select(i => i.ImageUrl)
-                            .ToList()
+                        .Where(i => i.ParentId == a.Id)
+                        .Select(i => i.ImageUrl)
+                        .ToList()
                 })
                 .ToListAsync();
         }
@@ -154,12 +153,12 @@ namespace dotnet9.Repositories
                     UpdatedAt = a.UpdatedAt,
                     UserName = a.User!.UserName!,
                     Category = a.Category!.Name,
-                    Requests = a.Requests!.Select(r => new RequestDto
+                    Requests = a.Requests!.Select(r => new RequestInfoDto
                     {
                         Id = r.Id,
                         Description = r.Description!,
                         Quantity = r.Quantity,
-                        UserId = r.UserId,
+                        Username = r.User!.UserName,
                         CreatedAt = r.CreatedAt,
                         UpdatedAt = r.UpdatedAt,
                         ArticleId = r.ArticleId,
