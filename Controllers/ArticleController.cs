@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace dotnet9.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace dotnet9.Controllers
         {
             try
             {
-                var article = await _articleMgmtService.CreateArticleWithImagesAsync(dto.ArticleDto, dto.ImageFiles!);
+                var article = await _articleMgmtService.CreateArticleWithImagesAsync(dto.ArticleDto, dto.ImageFiles);
                 return Ok(article);
             }
             catch (Exception ex)

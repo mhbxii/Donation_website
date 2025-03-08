@@ -41,24 +41,27 @@ namespace dotnet9.Services
             try{
                 var createdArticle = await _articleRepo.AddAsync(articleDto);
 
-                // Upload each image and attach it to the article.
-                foreach (var file in imageFiles)
+                if (imageFiles != null && imageFiles.Count != 0)
                 {
-                    // Upload the image to Cloudinary and get the URL.
-                    var imageUrl = await _imageUploadService.UploadImageAsync(file);
-                    if (!string.IsNullOrEmpty(imageUrl))
+                // Upload each image and attach it to the article.
+                    foreach (var file in imageFiles)
                     {
-                        // Save the image record.
-                        var imageDto = new ImageDto
+                        // Upload the image to Cloudinary and get the URL.
+                        var imageUrl = await _imageUploadService.UploadImageAsync(file);
+                        if (!string.IsNullOrEmpty(imageUrl))
                         {
-                            ParentId = createdArticle.Id,
-                            ImageUrl = imageUrl
-                        };
-                        await _ImageRepo.AddAsync(imageDto);
-                    }else
-                    {
-                        // If any image upload fails, throw an exception.
-                        throw new Exception("Image upload failed. Please check your internet connection and try again.");
+                            // Save the image record.
+                            var imageDto = new ImageDto
+                            {
+                                ParentId = createdArticle.Id,
+                                ImageUrl = imageUrl
+                            };
+                            await _ImageRepo.AddAsync(imageDto);
+                        }else
+                        {
+                            // If any image upload fails, throw an exception.
+                            throw new Exception("Image upload failed. Please check your internet connection and try again.");
+                        }
                     }
                 }
                 //Save Images
